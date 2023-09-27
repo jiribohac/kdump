@@ -34,7 +34,7 @@ if arch == "i386" or arch == "i586" or arch == "i686" or arch == "x86_64":
     image="vmlinuz"
 elif arch.startswith("s390"):
     image="image"
-elif arch == "aarch64":
+elif arch == "aarch64" or arch == "riscv64":
     image="Image"
 else:
     image="vmlinux"
