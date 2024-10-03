@@ -857,12 +857,6 @@ static unsigned long runtimeSize(SizeConstants const &sizes,
         required += 2 * DEF_FRAMEBUFFER_KB;
     }
 
-    // LUKS Argon2 hash requires a lot of memory
-	if (KDUMP_LUKS_MEMORY) {
-        required += KDUMP_LUKS_MEMORY;
-        DEBUG("Adding %lu KiB for crypto devices", KDUMP_LUKS_MEMORY);
-    }
-
     // Add space for constant slabs
     try {
         SlabInfos slab;
@@ -1067,6 +1061,11 @@ int main(int argc, char* argv[])
         // Reserve a fixed percentage on top of the calculation
         required = (required * (100 + ADD_RESERVE_PCT)) / 100 + ADD_RESERVE_KB;
 
+		// LUKS Argon2 hash requires a lot of memory
+		if (KDUMP_LUKS_MEMORY) {
+			required += KDUMP_LUKS_MEMORY;
+			DEBUG("Adding %lu KiB for crypto devices", KDUMP_LUKS_MEMORY);
+		}
     } catch(std::runtime_error &e) {
 	cerr << "Error calculating required reservation, using default: " << e.what() << endl;
 	required = DEF_RESERVE_KB;
