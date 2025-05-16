@@ -215,12 +215,16 @@ servicelog_notify --add --command=/usr/lib/kdump/kdump-migrate-action.sh --match
 exit 0
 
 %preun
-%ifarch ppc64 ppc64le
 if [ $1 -eq 0 ]; then
 	# removal, not upgrade
+%ifarch ppc64 ppc64le
 	servicelog_notify --remove --command=/usr/lib/kdump/kdump-migrate-action.sh
-fi
 %endif
+	. /usr/lib/kdump/kdump-read-config.sh
+	$KDUMP_UPDATE_BOOTLOADER && kdumptool commandline -d
+fi
+exit 0
+
 echo "Stopping kdump ..."
 %service_del_preun kdump.service
 %service_del_preun kdump-early.service
