@@ -365,11 +365,13 @@ with tempfile.TemporaryDirectory() as tmpdir:
     params['NET'] = False
     initrd = build_initrd(oldcwd, params, 'dummy.conf')
     results = run_qemu(oldcwd, params, initrd, elfcorehdr)
+    os.system("bash")
 
     params['NET'] = True
     initrd = build_initrd(oldcwd, params, 'dummy-net.conf')
     netresults = run_qemu(oldcwd, params, initrd, elfcorehdr)
     os.chdir(oldcwd)
+    os.system("bash")
 
 calc_diff(results, netresults, 'KERNEL_INIT', 'INIT_NET')
 calc_diff(results, netresults, 'INIT_CACHED', 'INIT_CACHED_NET')

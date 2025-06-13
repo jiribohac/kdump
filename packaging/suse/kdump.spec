@@ -78,13 +78,15 @@ BuildRequires:  pkgconfig(udev)
 # so turn them on unconditionally
 # %if %{with calibrate}
 BuildRequires:  %qemu
-BuildRequires:  dhcp-client
+BuildRequires:  udev
+BuildRequires:  NetworkManager
 BuildRequires:  dracut >= 047
 BuildRequires:  iputils
 BuildRequires:  kernel-default
 BuildRequires:  lftp
 BuildRequires:  makedumpfile
 BuildRequires:  openssh-clients
+BuildRequires:  openssh-server
 BuildRequires:  pciutils
 BuildRequires:  procps
 BuildRequires:  python3
