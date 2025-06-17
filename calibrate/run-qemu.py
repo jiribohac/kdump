@@ -309,12 +309,12 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     if not result.returncode:
         print("qemu result: ", result, file=sys.stderr)
 
-    tail_messages.kill()
-    tail_trackrss.kill()
-
     f = open(params['TRACKRSS_LOG'], "w")
     f.close()
-    tail_trackrss = subprocess.Popen(["cat", params['TRACKRSS_LOG']], stdout=2)
+    subprocess.Popen(["cat", params['TRACKRSS_LOG']], stdout=2)
+
+    tail_messages.kill()
+    #tail_trackrss.kill()
 
     results = dict()
 
