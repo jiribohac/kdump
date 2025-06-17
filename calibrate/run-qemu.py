@@ -334,7 +334,7 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
         if not result.returncode:
             print("mount result: ", result, file=sys.stderr)
 
-        result=subprocess.run("cat /tmp/mount/var/crash/README" stdout=sys.stderr, stderr=sys.stderr, check=True)
+        result=subprocess.run("cat /tmp/mount/var/crash/README", stdout=sys.stderr, stderr=sys.stderr, check=True)
         if not result.returncode:
             print("cat README result: ", result, file=sys.stderr)
 
