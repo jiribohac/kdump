@@ -309,7 +309,7 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     if params['NET']:
         print("not implemented yet")
     else:
-        result = subprocess.run(('dd', 'if=/dev/zero', 'of=/tmp/sda', 'bs=1M', 'seek=200'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+        result = subprocess.run(('dd', 'if=/dev/zero', 'of=/tmp/sda', 'bs=1', 'seek=200M'), stdout=sys.stderr, stderr=sys.stderr, check=True)
         if not result.returncode:
             print("dd result: ", result, file=sys.stderr)
 
