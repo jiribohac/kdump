@@ -307,6 +307,7 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
 
     
     if params['NET']:
+        print("not implemented yet")
     else:
         result = subprocess.run("dd if=/dev/zero of=/tmp/sda bs=1M seek=200" stdout=sys.stderr, stderr=sys.stderr, check=True)
         if not result.returncode:
@@ -326,6 +327,7 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     #tail_trackrss.kill()
     
     if params['NET']:
+        print("not implemented yet")
     else:
         subprocess.run("mkdir /tmp/mount" stdout=sys.stderr, stderr=sys.stderr, check=True)
         
