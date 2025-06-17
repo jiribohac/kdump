@@ -103,7 +103,7 @@ class build_initrd(object):
                 netdrivers.append('e1000e')
             extra_args = ('--add-drivers', ' '.join(netdrivers))
         else:
-            extra_args = ('--mount "/dev/sda /mnt/kdump0 ext3"')
+            extra_args = ('--mount', '/dev/sda /mnt/kdump0 ext3')
         args = (
             os.path.abspath('dracut'),
             '--local',
@@ -309,11 +309,11 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     if params['NET']:
         print("not implemented yet")
     else:
-        result = subprocess.run(("dd", "if=/dev/zero", "of=/tmp/sda", "bs=1M", "seek=200"), stdout=sys.stderr, stderr=sys.stderr, check=True)
+        result = subprocess.run(('dd', 'if=/dev/zero', 'of=/tmp/sda', 'bs=1M', 'seek=200'), stdout=sys.stderr, stderr=sys.stderr, check=True)
         if not result.returncode:
             print("dd result: ", result, file=sys.stderr)
 
-        result = subprocess.run(("mkfs.ext3", "/tmp/sda"), stdout=sys.stderr, stderr=sys.stderr, check=True)
+        result = subprocess.run(('mkfs.ext3', '/tmp/sda'), stdout=sys.stderr, stderr=sys.stderr, check=True)
         if not result.returncode:
             print("mkfs result: ", result, file=sys.stderr)
 
@@ -321,7 +321,7 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     if not result.returncode:
         print("qemu result: ", result, file=sys.stderr)
 
-    subprocess.Popen(["cat", params['TRACKRSS_LOG']], stdout=2)
+    subprocess.Popen(['cat', params['TRACKRSS_LOG']], stdout=2)
 
     tail_messages.kill()
     #tail_trackrss.kill()
@@ -329,12 +329,12 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     if params['NET']:
         print("not implemented yet")
     else:
-        os.mkdir("/tmp/mount")
-        result=subprocess.run(("mount", "-o", "loop", "/tmp/sda", "/tmp/mount"), stdout=sys.stderr, stderr=sys.stderr, check=True)
+        os.mkdir('/tmp/mount')
+        result=subprocess.run(('mount', '-o', 'loop', '/tmp/sda', '/tmp/mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
         if not result.returncode:
             print("mount result: ", result, file=sys.stderr)
 
-        result=subprocess.run(("cat", "/tmp/mount/var/crash/README"), stdout=sys.stderr, stderr=sys.stderr, check=True)
+        result=subprocess.run(('cat', '/tmp/mount/var/crash/README'), stdout=sys.stderr, stderr=sys.stderr, check=True)
         if not result.returncode:
             print("cat README result: ", result, file=sys.stderr)
 
