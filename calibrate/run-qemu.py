@@ -272,8 +272,8 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
         'console={}'.format(console),
         'root=kdump',
         'rootflags=bind',
-	'rd.shell=0',
-	'rd.emergency=poweroff',
+        'rd.shell=0',
+        'rd.emergency=poweroff',
         *extra_kernel_args,
         '--',
         'trackrss={}'.format(logdev),
@@ -288,7 +288,7 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
         '-kernel', params['KERNEL'],
         '-initrd', initrd.path,
         '-append', ' '.join(kernel_args),
-	'-hda /tmp/sda',
+        '-hda /tmp/sda',
         '-device', 'loader,file={},force-raw=on,addr=0x{:x}'.format(
             elfcorehdr.path, elfcorehdr.address),
         *extra_qemu_args,
@@ -311,11 +311,11 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     else:
         result = subprocess.run("dd if=/dev/zero of=/tmp/sda bs=1M seek=200", stdout=sys.stderr, stderr=sys.stderr, check=True)
         if not result.returncode:
-	    print("dd result: ", result, file=sys.stderr)
+            print("dd result: ", result, file=sys.stderr)
 
         result = subprocess.run("mkfs.ext3 /tmp/sda", stdout=sys.stderr, stderr=sys.stderr, check=True)
         if not result.returncode:
-	    print("mkfs result: ", result, file=sys.stderr)
+            print("mkfs result: ", result, file=sys.stderr)
 
     result = subprocess.run(qemu_args, stdout=sys.stderr, stderr=sys.stderr, check=True)
     if not result.returncode:
@@ -331,13 +331,13 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     else:
         subprocess.run("mkdir /tmp/mount" stdout=sys.stderr, stderr=sys.stderr, check=True)
         
-	result=subprocess.run("mount -o loop /tmp/sda /tmp/mount", stdout=sys.stderr, stderr=sys.stderr, check=True)
+        result=subprocess.run("mount -o loop /tmp/sda /tmp/mount", stdout=sys.stderr, stderr=sys.stderr, check=True)
         if not result.returncode:
-	    print("mount result: ", result, file=sys.stderr)
-	
-	result=subprocess.run("cat /tmp/mount/var/crash/README" stdout=sys.stderr, stderr=sys.stderr, check=True)
+            print("mount result: ", result, file=sys.stderr)
+
+        result=subprocess.run("cat /tmp/mount/var/crash/README" stdout=sys.stderr, stderr=sys.stderr, check=True)
         if not result.returncode:
-	    print("cat README result: ", result, file=sys.stderr)
+            print("cat README result: ", result, file=sys.stderr)
 
 
 
