@@ -300,9 +300,9 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     f.close()
     tail_messages = subprocess.Popen(["tail", "-f", params['MESSAGES_LOG']], stdout=2)
     
-    f = open(params['TRACKRSS_LOG'], "w")
-    f.close()
-    tail_trackrss = subprocess.Popen(["tail", "-f", params['TRACKRSS_LOG']], stdout=2)
+    #f = open(params['TRACKRSS_LOG'], "w")
+    #f.close()
+    #tail_trackrss = subprocess.Popen(["tail", "-f", params['TRACKRSS_LOG']], stdout=2)
 
     
     result = subprocess.run(qemu_args, stdout=sys.stderr, stderr=sys.stderr, check=True)
@@ -311,6 +311,10 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
 
     tail_messages.kill()
     tail_trackrss.kill()
+
+    f = open(params['TRACKRSS_LOG'], "w")
+    f.close()
+    tail_trackrss = subprocess.Popen(["cat", params['TRACKRSS_LOG']], stdout=2)
 
     results = dict()
 
