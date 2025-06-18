@@ -288,7 +288,7 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
         '-kernel', params['KERNEL'],
         '-initrd', initrd.path,
         '-append', ' '.join(kernel_args),
-        '-hda /tmp/sda',
+        '-hda', '/tmp/sda',
         '-device', 'loader,file={},force-raw=on,addr=0x{:x}'.format(
             elfcorehdr.path, elfcorehdr.address),
         *extra_qemu_args,
