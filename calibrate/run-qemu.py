@@ -103,7 +103,7 @@ class build_initrd(object):
                 netdrivers.append('e1000e')
             extra_args = ('--add-drivers', ' '.join(netdrivers))
         else:
-            extra_args = ('--mount', '/dev/sda /mnt/kdump0 ext3')
+            extra_args = ('--mount', '/dev/sda /kdump/mnt ext3')
         args = (
             os.path.abspath('dracut'),
             '--local',
