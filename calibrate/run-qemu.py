@@ -329,7 +329,10 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     if params['NET']:
         print("not implemented yet")
     else:
-        os.mkdir('/tmp/mount')
+        try:
+            os.mkdir('/tmp/mount')
+        except FileExistsError:
+            pass
         result=subprocess.run(('mount', '-o', 'loop', '/tmp/sda', '/tmp/mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
         if not result.returncode:
             print("mount result: ", result, file=sys.stderr)
