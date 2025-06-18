@@ -90,6 +90,7 @@ BuildRequires:  openssh-server
 BuildRequires:  pciutils
 BuildRequires:  procps
 BuildRequires:  python3
+BuildRequires:  e2fsprogs
 %ifnarch s390x
 BuildRequires:  qemu-ipxe
 BuildRequires:  qemu-vgabios

@@ -313,7 +313,7 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
         if not result.returncode:
             print("dd result: ", result, file=sys.stderr)
 
-        result = subprocess.run(('mkfs.ext3', '/tmp/sda'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+        result = subprocess.run(('/usr/sbin/mkfs.ext3', '/tmp/sda'), stdout=sys.stderr, stderr=sys.stderr, check=True)
         if not result.returncode:
             print("mkfs result: ", result, file=sys.stderr)
 
