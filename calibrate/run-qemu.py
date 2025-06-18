@@ -321,7 +321,7 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     if not result.returncode:
         print("qemu result: ", result, file=sys.stderr)
 
-    subprocess.Popen(['cat', params['TRACKRSS_LOG']], stdout=2)
+    subprocess.run(['cat', params['TRACKRSS_LOG']], stdout=2)
 
     tail_messages.kill()
     #tail_trackrss.kill()
