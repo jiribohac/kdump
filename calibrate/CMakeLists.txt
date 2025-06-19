@@ -33,6 +33,7 @@ ADD_CUSTOM_COMMAND(
     OUTPUT
         calibrate.conf
     COMMAND
+    	bash
         ${CMAKE_CURRENT_SOURCE_DIR}/run-qemu.py
         > ${CMAKE_CURRENT_BINARY_DIR}/calibrate.conf
     VERBATIM
