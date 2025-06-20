@@ -269,7 +269,7 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     
     if not params['NET']:
         # disk image for saving the dump
-        result = subprocess.run(('xdd', 'if=/dev/zero', 'of=/tmp/sda', 'bs=1', 'seek=200M', 'count=1'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+        result = subprocess.run(('dd', 'if=/dev/xzero', 'of=/tmp/sda', 'bs=1', 'seek=200M', 'count=1'), stdout=sys.stderr, stderr=sys.stderr, check=True)
         if not result.returncode:
             print("dd result: ", result, file=sys.stderr)
 
