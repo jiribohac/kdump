@@ -361,7 +361,6 @@ def dump_ok(crashdir):
                 print("found dump directory: " + entry.path, file=sys.stderr)
                 ret = True
                 if not os.path.isfile(os.path.join(entry.path, 'vmcore')):
-                s
                     print("vmcore not found", file=sys.stderr)
                     return False
 
