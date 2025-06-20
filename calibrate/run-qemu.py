@@ -280,7 +280,6 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
         extra_qemu_args.extend((
             '-hda', '/tmp/sda',
         ))
-    else:
         
 
     kernel_args = (
