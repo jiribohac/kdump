@@ -243,7 +243,7 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
             model = 'e1000e'
         mac = '12:34:56:78:9A:BC'
         extra_qemu_args.extend((
-            '-nic', 'user,mac={},model={}'.format(mac, model)
+            '-nic', 'user,net=192.168.1.1/24,mac={},model={}'.format(mac, model)
         ))
         #extra_kernel_args.extend((
         #    'ifname=kdump0:{}'.format(mac),
@@ -266,21 +266,10 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
         extra_qemu_args.extend((
             '-machine', 'virt',
         ))
-    
     if not params['NET']:
-        # disk image for saving the dump
-        result = subprocess.run(('dd', 'if=/dev/xzero', 'of=/tmp/sda', 'bs=1', 'seek=200M', 'count=1'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-        if not result.returncode:
-            print("dd result: ", result, file=sys.stderr)
-
-        result = subprocess.run(('/usr/sbin/mkfs.ext3', '/tmp/sda'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-        if not result.returncode:
-            print("mkfs result: ", result, file=sys.stderr)
-        
         extra_qemu_args.extend((
             '-hda', '/tmp/sda',
         ))
-        
 
     kernel_args = (
         'panic=1',
@@ -320,44 +309,10 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     f.close()
     #tail_trackrss = subprocess.Popen(["tail", "-f", params['TRACKRSS_LOG']], stdout=2)
 
-    result = subprocess.run(qemu_args, stdout=sys.stderr, stderr=sys.stderr, check=True)
-    if not result.returncode:
-        print("qemu result: ", result, file=sys.stderr)
+    subprocess.run(qemu_args, stdout=sys.stderr, stderr=sys.stderr, check=True)
 
     tail_messages.kill()
     
-    # verify that the crash dump completed
-    if not params['NET']:
-        # mount the disk image
-        try:
-            os.mkdir('/tmp/mount')
-        except FileExistsError:
-            pass
-        result=subprocess.run(('mount', '-o', 'loop', '/tmp/sda', '/tmp/mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-        if not result.returncode:
-            print("mount result: ", result, file=sys.stderr)
-        crashdir='/tmp/mount/var/crash'
-
-    with os.scandir(crashdir) as it:
-        for entry in it:
-            if not entry.name.startswith('.') and entry.isdir():
-                vmcore = os.path.Path(entry.name + '/vmcore')
-                if not vmcore.is_file():
-                    print("vmcore not found; calibration failed")
-                    exit(1)
-
-                with open(entry.name + '/README',"r") as f:
-                    readme = f.read()
-                    if not 'vmcore status: saved successfully' in readme:
-                        print("README does not contain vmcore success status; calibration failed")
-                        exit(1)
-
-    if not params['NET']:
-        # unmount the disk image
-        result=subprocess.run(('umount', '/tmp/mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-        if not result.returncode:
-            print("umount result: ", result, file=sys.stderr)
-		  	
     subprocess.run(['cat', params['TRACKRSS_LOG']], stdout=2)
 
     results = dict()
@@ -398,6 +353,22 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
 def calc_diff(src, dst, key, diffkey):
     src[diffkey] = max(0, dst[key] - src[key])
 
+def dump_ok(crashdir)
+    with os.scandir(crashdir) as it:
+        for entry in it:
+            if not entry.name.startswith('.') and entry.isdir():
+                vmcore = os.path.Path(entry.name + '/vmcore')
+                if not vmcore.is_file():
+                    print("vmcore not found; calibration failed")
+                    return False
+
+                with open(entry.name + '/README',"r") as f:
+                    readme = f.read()
+                    if not 'vmcore status: saved successfully' in readme:
+                        print("README does not contain vmcore success status; calibration failed")
+                        return False
+    return True
+
 with subprocess.Popen(('get_kernel_version', params['KERNEL']),
                       stdout=subprocess.PIPE) as p:
     params['KERNELVER'] = p.communicate()[0].decode().strip()
@@ -407,19 +378,38 @@ with tempfile.TemporaryDirectory() as tmpdir:
     os.chdir(tmpdir)
     elfcorehdr = build_elfcorehdr(oldcwd, ADDR_ELFCOREHDR)
 
+    # prepare disk image for saving the non-network dump
+    subprocess.run(('dd', 'if=/dev/zero', 'of=/tmp/sda', 'bs=1', 'seek=200M', 'count=1'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    subprocess.run(('/usr/sbin/mkfs.ext3', '/tmp/sda'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+
+    # configure and start ssh server for the network dump
+    subprocess.run(('systemctl', 'start', 'sshd',), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    subprocess.run(('ssh-keygen', '-f', '/root/id_ed25519', '-N', ''), stdout=sys.stderr, stderr=sys.stderr, check=True)
+
     install_kdump_init(oldcwd)
     init_local_dracut(params)
+    
+    try:
+        os.mkdir('/tmp/dump')
+    except FileExistsError:
+        pass
 
     params['NET'] = False
     initrd = build_initrd(oldcwd, params, 'dummy.conf')
     results = run_qemu(oldcwd, params, initrd, elfcorehdr)
-    os.system("bash")
-
+    # verify that the dump completed successfully
+    subprocess.run(('mount', '-o', 'loop', '/tmp/sda', '/tmp/dump'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    if not dump_ok('/tmp/dump')
+        exit(1)
+    subprocess.run(('umount', '/tmp/mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+		  	
     params['NET'] = True
     initrd = build_initrd(oldcwd, params, 'dummy-net.conf')
     netresults = run_qemu(oldcwd, params, initrd, elfcorehdr)
+    if not dump_ok('/tmp/dump')
+        exit(1)
+
     os.chdir(oldcwd)
-    os.system("bash")
 
 calc_diff(results, netresults, 'KERNEL_INIT', 'INIT_NET')
 calc_diff(results, netresults, 'INIT_CACHED', 'INIT_CACHED_NET')
