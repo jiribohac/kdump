@@ -357,12 +357,12 @@ def dump_ok(crashdir):
     with os.scandir(crashdir) as it:
         for entry in it:
             if not entry.name.startswith('.') and entry.is_dir():
-                vmcore = os.path.Path(entry.name + '/vmcore')
+                vmcore = os.path.join(entry.name, 'vmcore')
                 if not vmcore.is_file():
                     print("vmcore not found")
                     return False
 
-                with open(entry.name + '/README',"r") as f:
+                with open(os.path.join(entry.name, '/README'),"r") as f:
                     readme = f.read()
                     if not 'vmcore status: saved successfully' in readme:
                         print("README does not contain vmcore success status")
