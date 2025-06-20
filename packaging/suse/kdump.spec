@@ -79,6 +79,7 @@ BuildRequires:  pkgconfig(udev)
 # %if %{with calibrate}
 BuildRequires:  %qemu
 BuildRequires:  udev
+BuildRequires:  systemd
 BuildRequires:  NetworkManager
 BuildRequires:  dracut >= 047
 BuildRequires:  iputils
