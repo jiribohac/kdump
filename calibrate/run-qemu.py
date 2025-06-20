@@ -380,16 +380,16 @@ with tempfile.TemporaryDirectory() as tmpdir:
 
     # prepare disk image for saving the non-network dump
     if os.path.exists('/tmp/sda'):
-        os.remove(('/tmp/sda')
+        os.remove('/tmp/sda')
     subprocess.run(('dd', 'if=/dev/zero', 'of=/tmp/sda', 'bs=1', 'seek=200M', 'count=1'), stdout=sys.stderr, stderr=sys.stderr, check=True)
     subprocess.run(('/usr/sbin/mkfs.ext3', '/tmp/sda'), stdout=sys.stderr, stderr=sys.stderr, check=True)
 
     # configure and start ssh server for the network dump
     subprocess.run(('systemctl', 'start', 'sshd',), stdout=sys.stderr, stderr=sys.stderr, check=True)
     if os.path.exists('/root/id_ed25519'):
-        os.remove(('/root/id_ed25519')
+        os.remove('/root/id_ed25519')
     if os.path.exists('/root/id_ed25519.pub'):
-        os.remove(('/root/id_ed25519.pub')
+        os.remove('/root/id_ed25519.pub')
     subprocess.run(('ssh-keygen', '-f', '/root/id_ed25519', '-N', ''), stdout=sys.stderr, stderr=sys.stderr, check=True)
 
     install_kdump_init(oldcwd)
