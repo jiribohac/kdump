@@ -353,7 +353,7 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
 def calc_diff(src, dst, key, diffkey):
     src[diffkey] = max(0, dst[key] - src[key])
 
-def dump_ok(crashdir)
+def dump_ok(crashdir):
     with os.scandir(crashdir) as it:
         for entry in it:
             if not entry.name.startswith('.') and entry.isdir():
