@@ -359,13 +359,13 @@ def dump_ok(crashdir):
             if not entry.name.startswith('.') and entry.isdir():
                 vmcore = os.path.Path(entry.name + '/vmcore')
                 if not vmcore.is_file():
-                    print("vmcore not found; calibration failed")
+                    print("vmcore not found")
                     return False
 
                 with open(entry.name + '/README',"r") as f:
                     readme = f.read()
                     if not 'vmcore status: saved successfully' in readme:
-                        print("README does not contain vmcore success status; calibration failed")
+                        print("README does not contain vmcore success status")
                         return False
     return True
 
@@ -399,14 +399,16 @@ with tempfile.TemporaryDirectory() as tmpdir:
     results = run_qemu(oldcwd, params, initrd, elfcorehdr)
     # verify that the dump completed successfully
     subprocess.run(('mount', '-o', 'loop', '/tmp/sda', '/tmp/dump'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-    if not dump_ok('/tmp/dump')
+    if not dump_ok('/tmp/dump'):
+        print("non-network dump failed; calibration failed")
         exit(1)
     subprocess.run(('umount', '/tmp/mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
 		  	
     params['NET'] = True
     initrd = build_initrd(oldcwd, params, 'dummy-net.conf')
     netresults = run_qemu(oldcwd, params, initrd, elfcorehdr)
-    if not dump_ok('/tmp/dump')
+    if not dump_ok('/tmp/dump'):
+        print("network dump failed; calibration failed")
         exit(1)
 
     os.chdir(oldcwd)
