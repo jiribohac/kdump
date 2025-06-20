@@ -356,7 +356,7 @@ def calc_diff(src, dst, key, diffkey):
 def dump_ok(crashdir):
     with os.scandir(crashdir) as it:
         for entry in it:
-            if not entry.name.startswith('.') and entry.isdir():
+            if not entry.name.startswith('.') and entry.is_dir():
                 vmcore = os.path.Path(entry.name + '/vmcore')
                 if not vmcore.is_file():
                     print("vmcore not found")
