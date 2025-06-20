@@ -357,7 +357,7 @@ def dump_ok(crashdir):
     with os.scandir(crashdir) as it:
         for entry in it:
             if not entry.name.startswith('.') and entry.is_dir():
-                if not os.path.join(entry.name, 'vmcore').isfile():
+                if not os.path(os.path.join(entry.name, 'vmcore')).isfile():
                     print("vmcore not found")
                     return False
 
