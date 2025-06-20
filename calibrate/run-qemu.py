@@ -266,6 +266,23 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
         extra_qemu_args.extend((
             '-machine', 'virt',
         ))
+    
+    if not params['NET']:
+        # disk image for saving the dump
+        result = subprocess.run(('xdd', 'if=/dev/zero', 'of=/tmp/sda', 'bs=1', 'seek=200M', 'count=1'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+        if not result.returncode:
+            print("dd result: ", result, file=sys.stderr)
+
+        result = subprocess.run(('/usr/sbin/mkfs.ext3', '/tmp/sda'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+        if not result.returncode:
+            print("mkfs result: ", result, file=sys.stderr)
+        
+        extra_qemu_args.extend((
+            '-hda', '/tmp/sda',
+        ))
+    else:
+        
+
     kernel_args = (
         'panic=1',
         'nokaslr',
@@ -288,7 +305,6 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
         '-kernel', params['KERNEL'],
         '-initrd', initrd.path,
         '-append', ' '.join(kernel_args),
-        '-hda', '/tmp/sda',
         '-device', 'loader,file={},force-raw=on,addr=0x{:x}'.format(
             elfcorehdr.path, elfcorehdr.address),
         *extra_qemu_args,
@@ -305,30 +321,15 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     f.close()
     #tail_trackrss = subprocess.Popen(["tail", "-f", params['TRACKRSS_LOG']], stdout=2)
 
-    
-    if params['NET']:
-        print("not implemented yet")
-    else:
-        result = subprocess.run(('dd', 'if=/dev/zero', 'of=/tmp/sda', 'bs=1', 'seek=200M', 'count=1'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-        if not result.returncode:
-            print("dd result: ", result, file=sys.stderr)
-
-        result = subprocess.run(('/usr/sbin/mkfs.ext3', '/tmp/sda'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-        if not result.returncode:
-            print("mkfs result: ", result, file=sys.stderr)
-
     result = subprocess.run(qemu_args, stdout=sys.stderr, stderr=sys.stderr, check=True)
     if not result.returncode:
         print("qemu result: ", result, file=sys.stderr)
 
-    subprocess.run(['cat', params['TRACKRSS_LOG']], stdout=2)
-
     tail_messages.kill()
-    #tail_trackrss.kill()
     
-    if params['NET']:
-        print("not implemented yet")
-    else:
+    # verify that the crash dump completed
+    if not params['NET']:
+        # mount the disk image
         try:
             os.mkdir('/tmp/mount')
         except FileExistsError:
@@ -336,12 +337,29 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
         result=subprocess.run(('mount', '-o', 'loop', '/tmp/sda', '/tmp/mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
         if not result.returncode:
             print("mount result: ", result, file=sys.stderr)
+        crashdir='/tmp/mount/var/crash'
 
-        result=subprocess.run(('cat', '/tmp/mount/var/crash/README'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    with os.scandir(crashdir) as it:
+        for entry in it:
+            if not entry.name.startswith('.') and entry.isdir():
+                vmcore = os.path.Path(entry.name . '/vmcore')
+                if not vmcore.is_file():
+                    print("vmcore not found; calibration failed")
+                    exit(1)
+
+                with open(entry.name . '/README',"r") as f:
+                    readme = f.read()
+                    if not 'vmcore status: saved successfully' in readme:
+                        print("README does not contain vmcore success status; calibration failed")
+                        exit(1)
+
+    if not params['NET']:
+        # unmount the disk image
+        result=subprocess.run(('umount', '/tmp/mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
         if not result.returncode:
-            print("cat README result: ", result, file=sys.stderr)
-
-
+            print("umount result: ", result, file=sys.stderr)
+		  	
+    subprocess.run(['cat', params['TRACKRSS_LOG']], stdout=2)
 
     results = dict()
 
@@ -422,3 +440,5 @@ keys = (
 )
 for key in keys:
     print('{}={:d}'.format(key, results[key]))
+
+# vim: set et ts=4 sw=4 :
