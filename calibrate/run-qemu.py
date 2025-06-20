@@ -385,7 +385,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
         os.remove('/root/id_ed25519')
     if os.path.exists('/root/id_ed25519.pub'):
         os.remove('/root/id_ed25519.pub')
-    subprocess.run(('rm', '-rf', '/tmp/netdump'), stdout=sys.stderr, stderr=sys.stderr, check=False)
+    subprocess.run(('rm', '-rf', '/tmp/netdump', '/tmp/mount'), stdout=sys.stderr, stderr=sys.stderr, check=False)
 
     # prepare disk image for saving the non-network dump
     subprocess.run(('dd', 'if=/dev/zero', 'of=sda.raw', 'bs=1', 'seek=200M', 'count=1'), stdout=sys.stderr, stderr=sys.stderr, check=True)
@@ -402,10 +402,10 @@ with tempfile.TemporaryDirectory() as tmpdir:
     initrd = build_initrd(oldcwd, params, 'dummy.conf')
     results = run_qemu(oldcwd, params, initrd, elfcorehdr)
     # verify that the dump completed successfully
-    os.mkdir('mount')
-    subprocess.run(('mount', '-o', 'loop', 'sda.raw', 'mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-    ret = dump_ok('mount/var/crash')
-    subprocess.run(('umount', 'mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    os.mkdir('/tmp/mount')
+    subprocess.run(('mount', '-o', 'loop', 'sda.raw', '/tmp/mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    ret = dump_ok('/tmp/mount/var/crash')
+    subprocess.run(('umount', '/tmp/mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
     if not ret:
         print("non-network dump failed; calibration failed", file=sys.stderr)
         exit(1)
