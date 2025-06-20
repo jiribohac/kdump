@@ -405,7 +405,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
     # verify that the dump completed successfully
     subprocess.run(('mount', '-o', 'loop', '/tmp/sda', '/tmp/dump'), stdout=sys.stderr, stderr=sys.stderr, check=True)
     ret = dump_ok('/tmp/dump')
-    subprocess.run(('umount', '/tmp/mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    subprocess.run(('umount', '/tmp/dump'), stdout=sys.stderr, stderr=sys.stderr, check=True)
     if not ret:
         print("non-network dump failed; calibration failed")
         exit(1)
