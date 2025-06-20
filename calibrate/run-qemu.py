@@ -399,10 +399,11 @@ with tempfile.TemporaryDirectory() as tmpdir:
     results = run_qemu(oldcwd, params, initrd, elfcorehdr)
     # verify that the dump completed successfully
     subprocess.run(('mount', '-o', 'loop', '/tmp/sda', '/tmp/dump'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-    if not dump_ok('/tmp/dump'):
+    ret = dump_ok('/tmp/dump')
+    subprocess.run(('umount', '/tmp/mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    if not ret:
         print("non-network dump failed; calibration failed")
         exit(1)
-    subprocess.run(('umount', '/tmp/mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
 		  	
     params['NET'] = True
     initrd = build_initrd(oldcwd, params, 'dummy-net.conf')
