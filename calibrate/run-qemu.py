@@ -385,6 +385,8 @@ with tempfile.TemporaryDirectory() as tmpdir:
         os.remove('/root/id_ed25519')
     if os.path.exists('/root/id_ed25519.pub'):
         os.remove('/root/id_ed25519.pub')
+    subprocess.run(('rm', '-rf', '/tmp/netdump'), stdout=sys.stderr, stderr=sys.stderr, check=False)
+
     # prepare disk image for saving the non-network dump
     subprocess.run(('dd', 'if=/dev/zero', 'of=sda.raw', 'bs=1', 'seek=200M', 'count=1'), stdout=sys.stderr, stderr=sys.stderr, check=True)
     subprocess.run(('/usr/sbin/mkfs.ext3', 'sda.raw'), stdout=sys.stderr, stderr=sys.stderr, check=True)
@@ -396,23 +398,23 @@ with tempfile.TemporaryDirectory() as tmpdir:
     install_kdump_init(oldcwd)
     init_local_dracut(params)
     
-    os.mkdir('dump')
-
     params['NET'] = False
     initrd = build_initrd(oldcwd, params, 'dummy.conf')
     results = run_qemu(oldcwd, params, initrd, elfcorehdr)
     # verify that the dump completed successfully
-    subprocess.run(('mount', '-o', 'loop', 'sda.raw', 'dump'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-    ret = dump_ok('dump')
-    subprocess.run(('umount', 'dump'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    os.mkdir('mount')
+    subprocess.run(('mount', '-o', 'loop', 'sda.raw', 'mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    ret = dump_ok('mount')
+    subprocess.run(('umount', 'mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
     if not ret:
         print("non-network dump failed; calibration failed", file=sys.stderr)
         exit(1)
 		  	
     params['NET'] = True
     initrd = build_initrd(oldcwd, params, 'dummy-net.conf')
+    os.mkdir('/tmp/netdump')
     netresults = run_qemu(oldcwd, params, initrd, elfcorehdr)
-    if not dump_ok('dump'):
+    if not dump_ok('/tmp/netdump'):
         print("network dump failed; calibration failed", file=sys.stderr)
         exit(1)
 
