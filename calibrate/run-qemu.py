@@ -354,9 +354,12 @@ def calc_diff(src, dst, key, diffkey):
     src[diffkey] = max(0, dst[key] - src[key])
 
 def dump_ok(crashdir):
+    ret = False
     with os.scandir(crashdir) as it:
         for entry in it:
             if not entry.name.startswith('.') and entry.is_dir():
+                print("found dump directory: " + entry.name
+                ret = True
                 if not os.path.isfile(os.path.join(entry.name, 'vmcore')):
                     print("vmcore not found")
                     return False
@@ -366,7 +369,7 @@ def dump_ok(crashdir):
                     if not 'vmcore status: saved successfully' in readme:
                         print("README does not contain vmcore success status")
                         return False
-    return True
+    return ret
 
 with subprocess.Popen(('get_kernel_version', params['KERNEL']),
                       stdout=subprocess.PIPE) as p:
@@ -383,21 +386,17 @@ with tempfile.TemporaryDirectory() as tmpdir:
     subprocess.run(('dd', 'if=/dev/zero', 'of=/tmp/sda', 'bs=1', 'seek=200M', 'count=1'), stdout=sys.stderr, stderr=sys.stderr, check=True)
     subprocess.run(('/usr/sbin/mkfs.ext3', '/tmp/sda'), stdout=sys.stderr, stderr=sys.stderr, check=True)
 
+    # clean up after previous runs
+    subprocess.run(('rm', '-rf', '/tmp/dump', '/root/id_ed25519', '/root/id_ed25519.pub'), stdout=sys.stderr, stderr=sys.stderr, check=False)
+
     # configure and start ssh server for the network dump
     subprocess.run(('systemctl', 'start', 'sshd',), stdout=sys.stderr, stderr=sys.stderr, check=True)
-    if os.path.exists('/root/id_ed25519'):
-        os.remove('/root/id_ed25519')
-    if os.path.exists('/root/id_ed25519.pub'):
-        os.remove('/root/id_ed25519.pub')
     subprocess.run(('ssh-keygen', '-f', '/root/id_ed25519', '-N', ''), stdout=sys.stderr, stderr=sys.stderr, check=True)
 
     install_kdump_init(oldcwd)
     init_local_dracut(params)
     
-    try:
-        os.mkdir('/tmp/dump')
-    except FileExistsError:
-        pass
+    os.mkdir('/tmp/dump')
 
     params['NET'] = False
     initrd = build_initrd(oldcwd, params, 'dummy.conf')
