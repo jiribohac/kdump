@@ -341,12 +341,12 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     with os.scandir(crashdir) as it:
         for entry in it:
             if not entry.name.startswith('.') and entry.isdir():
-                vmcore = os.path.Path(entry.name . '/vmcore')
+                vmcore = os.path.Path(entry.name + '/vmcore')
                 if not vmcore.is_file():
                     print("vmcore not found; calibration failed")
                     exit(1)
 
-                with open(entry.name . '/README',"r") as f:
+                with open(entry.name + '/README',"r") as f:
                     readme = f.read()
                     if not 'vmcore status: saved successfully' in readme:
                         print("README does not contain vmcore success status; calibration failed")
