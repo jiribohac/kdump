@@ -14,7 +14,7 @@
 
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
-#!needsrootforbuild
+#needsrootforbuild
 
 %bcond_with calibrate
 
