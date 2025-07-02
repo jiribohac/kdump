@@ -83,7 +83,7 @@ def init_local_dracut(params):
         else:
             os.symlink(os.path.join(basedir, name), name)
 
-def build_initrd(self, bindir, params, config, path):
+def build_initrd(bindir, params, config, path):
         # First, create the base initrd using dracut:
         env = os.environ.copy()
         env['KDUMP_LIBDIR'] = os.path.abspath(params['SCRIPTDIR'] + "/..")
