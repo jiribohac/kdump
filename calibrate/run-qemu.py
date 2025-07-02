@@ -368,7 +368,7 @@ def dump_ok(crashdir):
                 try:
                     f = open(os.path.join(entry.path, 'README.txt'),"r")
                     readme = f.read()
-                    if not 'vmcore status: saved successfullyx' in readme:
+                    if not 'vmcore status: saved successfully' in readme:
                         print("README.txt does not contain vmcore success status", file=sys.stderr)
                         return False
                 except:
@@ -388,10 +388,10 @@ with tempfile.TemporaryDirectory() as tmpdir:
     elfcorehdr = build_elfcorehdr(oldcwd, ADDR_ELFCOREHDR)
 
     # clean up after previous runs
-    if os.path.exists('/root/id_ed25519'):
-        os.remove('/root/id_ed25519')
-    if os.path.exists('/root/id_ed25519.pub'):
-        os.remove('/root/id_ed25519.pub')
+    if os.path.exists('/root/.ssh/id_ed25519'):
+        os.remove('/root/.ssh/id_ed25519')
+    if os.path.exists('/root/.ssh/id_ed25519.pub'):
+        os.remove('/root/.ssh/id_ed25519.pub')
     subprocess.run(('rm', '-rf', '/tmp/netdump'), stdout=sys.stderr, stderr=sys.stderr, check=False)
 
     # prepare disk image for saving the non-network dump
@@ -399,8 +399,8 @@ with tempfile.TemporaryDirectory() as tmpdir:
     subprocess.run(('/usr/sbin/mkfs.ext3', 'sda.raw'), stdout=sys.stderr, stderr=sys.stderr, check=True)
 
     # configure and start ssh server for the network dump
-    #subprocess.run(('ssh-keygen', '-A'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-    #subprocess.run(('/usr/sbin/sshd'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    subprocess.run(('ssh-keygen', '-A'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    subprocess.run(('/usr/sbin/sshd'), stdout=sys.stderr, stderr=sys.stderr, check=True)
     subprocess.run(('ssh-keygen', '-f', '/root/.ssh/id_ed25519', '-N', ''), stdout=sys.stderr, stderr=sys.stderr, check=True)
 
     install_kdump_init(oldcwd)
