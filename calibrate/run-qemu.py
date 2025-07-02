@@ -139,7 +139,7 @@ def build_initrd(self, bindir, params, config, path):
 
         # Compress the result:
         subprocess.call(('xz', '-f', '-0', '--check=crc32', path))
-        return = path + os.path.extsep + 'xz'
+        return path + os.path.extsep + 'xz'
 
 class build_elfcorehdr(object):
     def __init__(self, bindir, addr, path='elfcorehdr.bin'):

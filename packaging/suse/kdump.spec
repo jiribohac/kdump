@@ -82,7 +82,7 @@ BuildRequires:  udev
 BuildRequires:  systemd
 BuildRequires:  NetworkManager
 BuildRequires:  iproute2
-BuildRequires:  dbus
+BuildRequires:  dbus-1
 BuildRequires:  dracut >= 047
 BuildRequires:  iputils
 BuildRequires:  kernel-default
