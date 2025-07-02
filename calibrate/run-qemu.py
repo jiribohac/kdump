@@ -402,6 +402,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
     subprocess.run(('ssh-keygen', '-A'), stdout=sys.stderr, stderr=sys.stderr, check=True)
     subprocess.run(('/usr/sbin/sshd', '-p', '40022'), stdout=sys.stderr, stderr=sys.stderr, check=True)
     subprocess.run(('ssh-keygen', '-f', '/root/.ssh/id_ed25519', '-N', ''), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    shutil.copy("/root/.ssh/id_ed25519.pub", "/root/.ssh/authorized_keys")
 
     install_kdump_init(oldcwd)
     init_local_dracut(params)
