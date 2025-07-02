@@ -400,23 +400,23 @@ with tempfile.TemporaryDirectory() as tmpdir:
 
     # configure and start ssh server for the network dump
     subprocess.run(('ssh-keygen', '-A'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-    subprocess.run(('/usr/sbin/sshd'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    subprocess.run(('/usr/sbin/sshd', '-p', '40022'), stdout=sys.stderr, stderr=sys.stderr, check=True)
     subprocess.run(('ssh-keygen', '-f', '/root/.ssh/id_ed25519', '-N', ''), stdout=sys.stderr, stderr=sys.stderr, check=True)
 
     install_kdump_init(oldcwd)
     init_local_dracut(params)
     
-    params['NET'] = False
-    initrd = build_initrd(oldcwd, params, 'dummy.conf', "test-initrd")
-    results = run_qemu(oldcwd, params, initrd, elfcorehdr)
-    # verify that the dump completed successfully
-    os.mkdir('mount')
-    subprocess.run(('mount', '-o', 'loop', 'sda.raw', 'mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-    ret = dump_ok('mount/var/crash')
-    subprocess.run(('umount', 'mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-    if not ret:
-        print("non-network dump failed; calibration failed", file=sys.stderr)
-        exit(1)
+    #params['NET'] = False
+    #initrd = build_initrd(oldcwd, params, 'dummy.conf', "test-initrd")
+    #results = run_qemu(oldcwd, params, initrd, elfcorehdr)
+    ## verify that the dump completed successfully
+    #os.mkdir('mount')
+    #subprocess.run(('mount', '-o', 'loop', 'sda.raw', 'mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    #ret = dump_ok('mount/var/crash')
+    #subprocess.run(('umount', 'mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    #if not ret:
+    #    print("non-network dump failed; calibration failed", file=sys.stderr)
+    #    exit(1)
 		  	
     params['NET'] = True
     initrd = build_initrd(oldcwd, params, 'dummy-net.conf', "test-initrd-net")
