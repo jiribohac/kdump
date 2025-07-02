@@ -399,6 +399,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
     subprocess.run(('/usr/sbin/mkfs.ext3', 'sda.raw'), stdout=sys.stderr, stderr=sys.stderr, check=True)
 
     # configure and start ssh server for the network dump
+    subprocess.run(('ssh-keygen', '-A'), stdout=sys.stderr, stderr=sys.stderr, check=True)
     subprocess.run(('/usr/sbin/sshd'), stdout=sys.stderr, stderr=sys.stderr, check=True)
     subprocess.run(('ssh-keygen', '-f', '/root/.ssh/id_ed25519', '-N', ''), stdout=sys.stderr, stderr=sys.stderr, check=True)
 
