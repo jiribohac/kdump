@@ -246,7 +246,8 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
         ))
         extra_kernel_args.extend((
             'ifname=kdump0:{}'.format(mac),
-            'ip=kdump0:dhcp'
+            'ip=kdump0:dhcp',
+            'rd.neednet=1'
         ))
 
     # Other arch-specific arguments
