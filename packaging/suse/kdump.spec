@@ -81,6 +81,7 @@ BuildRequires:  %qemu
 BuildRequires:  udev
 BuildRequires:  systemd
 BuildRequires:  NetworkManager
+BuildRequires:  iproute2
 BuildRequires:  dracut >= 047
 BuildRequires:  iputils
 BuildRequires:  kernel-default
