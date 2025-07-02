@@ -407,17 +407,17 @@ with tempfile.TemporaryDirectory() as tmpdir:
     install_kdump_init(oldcwd)
     init_local_dracut(params)
     
-    #params['NET'] = False
-    #initrd = build_initrd(oldcwd, params, 'dummy.conf', "test-initrd")
-    #results = run_qemu(oldcwd, params, initrd, elfcorehdr)
-    ## verify that the dump completed successfully
-    #os.mkdir('mount')
-    #subprocess.run(('mount', '-o', 'loop', 'sda.raw', 'mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-    #ret = dump_ok('mount/var/crash')
-    #subprocess.run(('umount', 'mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-    #if not ret:
-    #    print("non-network dump failed; calibration failed", file=sys.stderr)
-    #    exit(1)
+    params['NET'] = False
+    initrd = build_initrd(oldcwd, params, 'dummy.conf', "test-initrd")
+    results = run_qemu(oldcwd, params, initrd, elfcorehdr)
+    # verify that the dump completed successfully
+    os.mkdir('mount')
+    subprocess.run(('mount', '-o', 'loop', 'sda.raw', 'mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    ret = dump_ok('mount/var/crash')
+    subprocess.run(('umount', 'mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    if not ret:
+        print("non-network dump failed; calibration failed", file=sys.stderr)
+        exit(1)
 		  	
     params['NET'] = True
     initrd = build_initrd(oldcwd, params, 'dummy-net.conf', "test-initrd-net")
