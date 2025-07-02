@@ -83,8 +83,7 @@ def init_local_dracut(params):
         else:
             os.symlink(os.path.join(basedir, name), name)
 
-class build_initrd(object):
-    def __init__(self, bindir, params, config, path='test-initrd'):
+def build_initrd(self, bindir, params, config, path):
         # First, create the base initrd using dracut:
         env = os.environ.copy()
         env['KDUMP_LIBDIR'] = os.path.abspath(params['SCRIPTDIR'] + "/..")
@@ -140,7 +139,7 @@ class build_initrd(object):
 
         # Compress the result:
         subprocess.call(('xz', '-f', '-0', '--check=crc32', path))
-        self.path = path + os.path.extsep + 'xz'
+        return = path + os.path.extsep + 'xz'
 
 class build_elfcorehdr(object):
     def __init__(self, bindir, addr, path='elfcorehdr.bin'):
@@ -291,7 +290,7 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
         '-display', 'none',
         *console_args,
         '-kernel', params['KERNEL'],
-        '-initrd', initrd.path,
+        '-initrd', initrd,
         '-append', ' '.join(kernel_args),
         '-device', 'loader,file={},force-raw=on,addr=0x{:x}'.format(
             elfcorehdr.path, elfcorehdr.address),
@@ -407,7 +406,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
     init_local_dracut(params)
     
     params['NET'] = False
-    initrd = build_initrd(oldcwd, params, 'dummy.conf')
+    initrd = build_initrd(oldcwd, params, 'dummy.conf', "test-initrd")
     results = run_qemu(oldcwd, params, initrd, elfcorehdr)
     # verify that the dump completed successfully
     os.mkdir('mount')
@@ -419,7 +418,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
         exit(1)
 		  	
     params['NET'] = True
-    initrd = build_initrd(oldcwd, params, 'dummy-net.conf')
+    initrd = build_initrd(oldcwd, params, 'dummy-net.conf', "test-initrd-net")
     os.mkdir('/tmp/netdump')
     netresults = run_qemu(oldcwd, params, initrd, elfcorehdr)
     if not dump_ok('/tmp/netdump'):
