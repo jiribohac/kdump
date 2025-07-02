@@ -242,7 +242,7 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
             model = 'e1000e'
         mac = '12:34:56:78:9A:BC'
         extra_qemu_args.extend((
-            '-nic', 'user,net=192.168.1.1/24,mac={},model={}'.format(mac, model)
+            '-nic', 'user,mac={},model={}'.format(mac, model)
         ))
         #extra_kernel_args.extend((
         #    'ifname=kdump0:{}'.format(mac),
