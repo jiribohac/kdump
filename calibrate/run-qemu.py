@@ -363,12 +363,20 @@ def dump_ok(crashdir):
                 if not os.path.isfile(os.path.join(entry.path, 'vmcore')):
                     print("vmcore not found", file=sys.stderr)
                     return False
+                
+                if not os.path.isfile(os.path.join(entry.path, 'README.txt')):
+                    print("README.txt not found", file=sys.stderr)
+                    return False
 
-                with open(os.path.join(entry.path, 'README'),"r") as f:
+                try:
+                    f = open(os.path.join(entry.path, 'README.txt'),"r")
                     readme = f.read()
                     if not 'vmcore status: saved successfully' in readme:
-                        print("README does not contain vmcore success status", file=sys.stderr)
+                        print("README.txt does not contain vmcore success status", file=sys.stderr)
                         return False
+                except:
+                    print("can't read README.txt", file=sys.stderr)
+                    return false 
     return ret
 
 with subprocess.Popen(('get_kernel_version', params['KERNEL']),
