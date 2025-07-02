@@ -353,12 +353,10 @@ def calc_diff(src, dst, key, diffkey):
     src[diffkey] = max(0, dst[key] - src[key])
 
 def dump_ok(crashdir):
-    ret = False
     with os.scandir(crashdir) as it:
         for entry in it:
             if not entry.name.startswith('.') and entry.is_dir():
                 print("found dump directory: " + entry.path, file=sys.stderr)
-                ret = True
                 if not os.path.isfile(os.path.join(entry.path, 'vmcore')):
                     print("vmcore not found", file=sys.stderr)
                     return False
@@ -370,13 +368,15 @@ def dump_ok(crashdir):
                 try:
                     f = open(os.path.join(entry.path, 'README.txt'),"r")
                     readme = f.read()
-                    if not 'vmcore status: saved successfully' in readme:
+                    if not 'vmcore status: saved successfullyx' in readme:
                         print("README.txt does not contain vmcore success status", file=sys.stderr)
                         return False
                 except:
                     print("can't read README.txt", file=sys.stderr)
-                    return false 
-    return ret
+                    return False 
+                print("vmcore and README.txt check OK", file=sys.stderr)
+                return True
+    return False
 
 with subprocess.Popen(('get_kernel_version', params['KERNEL']),
                       stdout=subprocess.PIPE) as p:
@@ -399,7 +399,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
     subprocess.run(('/usr/sbin/mkfs.ext3', 'sda.raw'), stdout=sys.stderr, stderr=sys.stderr, check=True)
 
     # configure and start ssh server for the network dump
-    subprocess.run(('systemctl', 'start', 'sshd',), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    subprocess.run(('/usr/sbin/sshd'), stdout=sys.stderr, stderr=sys.stderr, check=True)
     subprocess.run(('ssh-keygen', '-f', '/root/.ssh/id_ed25519', '-N', ''), stdout=sys.stderr, stderr=sys.stderr, check=True)
 
     install_kdump_init(oldcwd)
