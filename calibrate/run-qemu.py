@@ -103,7 +103,8 @@ def build_initrd(bindir, params, config, path):
                 drivers.append('e1000e')
             extra_args = []
         else:
-            if params['ARCH'].startswith('x86'):
+            if params['ARCH'].startswith('x86') or 
+               params['ARCH'].startswith('ppc'): 
                 extra_args = ('--mount', '/dev/sda /kdump/mnt ext3')
                 drivers.append('sd_mod')
             else:
