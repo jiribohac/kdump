@@ -228,8 +228,8 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     if arch.startswith('s390'):
         S390_OLDMEM_BASE = 0x10418 # cf. struct parmarea
         oldmem = 'oldmem.bin'
-        oldmem_size = 0
-        oldmem_base = 0
+        oldmem_size = qemu_ram * 1024
+        oldmem_base = oldmem_size
         with open(oldmem, 'wb') as f:
             f.write(oldmem_base.to_bytes(8, 'big'))
             f.write(oldmem_size.to_bytes(8, 'big'))
