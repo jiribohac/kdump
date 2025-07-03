@@ -110,7 +110,6 @@ def build_initrd(bindir, params, config, path):
                 extra_args = ('--mount', '/dev/vda /kdump/mnt ext3')
                 drivers.append('virtio_blk')
 
-            extra_args = []
             drivers.append('ext4')
         args = (
             os.path.abspath('dracut'),
