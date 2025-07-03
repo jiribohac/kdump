@@ -260,7 +260,7 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
         ))
     else:
         extra_qemu_args.extend((
-            '-hda', 'sda.raw',
+            '-hda', 'disk.raw',
         ))
 
     # Other arch-specific arguments
