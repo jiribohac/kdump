@@ -94,14 +94,17 @@ def build_initrd(bindir, params, config, path):
             '/usr/sbin',
             '/usr/bin'))
 
+        drivers = []
         if params['NET']:
-            netdrivers = [ 'af_packet' ]
+            drivers.append('af_packet')
             if params['ARCH'].startswith('s390'):
-                netdrivers.append('virtio-net')
+                drivers.append('virtio-net')
             else:
-                netdrivers.append('e1000e')
-            extra_args = ('--add-drivers', ' '.join(netdrivers))
+                drivers.append('e1000e')
+            extra_args = []
         else:
+            drivers.append('ext4')
+            drivers.append('sd_mod')
             extra_args = ('--mount', '/dev/sda /kdump/mnt ext3')
         args = (
             os.path.abspath('dracut'),
@@ -116,7 +119,7 @@ def build_initrd(bindir, params, config, path):
             # Create a simple uncompressed CPIO archive:
             '--no-compress',
             '--no-early-microcode',
-
+            ('--add-drivers', ' '.join(drivers))
             # Additional options:
             *extra_args,
 
