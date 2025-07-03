@@ -119,7 +119,7 @@ def build_initrd(bindir, params, config, path):
             # Create a simple uncompressed CPIO archive:
             '--no-compress',
             '--no-early-microcode',
-            ('--add-drivers', ' '.join(drivers))
+            '--add-drivers', ' '.join(drivers)
             # Additional options:
             *extra_args,
 
