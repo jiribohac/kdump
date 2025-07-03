@@ -363,7 +363,7 @@ def calc_diff(src, dst, key, diffkey):
 
 def dump_ok(crashdir):
     if not os.path.isdir(crashdir):
-        print(crashdir + "does not exist", file=sys.stderr)
+        print(crashdir + " does not exist", file=sys.stderr)
 
     with os.scandir(crashdir) as it:
         for entry in it:
