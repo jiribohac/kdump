@@ -103,9 +103,15 @@ def build_initrd(bindir, params, config, path):
                 drivers.append('e1000e')
             extra_args = []
         else:
+            if params['ARCH'].startswith('x86'):
+                extra_args = ('--mount', '/dev/sda /kdump/mnt ext3')
+                drivers.append('sd_mod')
+            else:
+                extra_args = ('--mount', '/dev/vda /kdump/mnt ext3')
+                drivers.append('virtio_blk')
+
+            extra_args = []
             drivers.append('ext4')
-            drivers.append('sd_mod')
-            extra_args = ('--mount', '/dev/sda /kdump/mnt ext3')
         args = (
             os.path.abspath('dracut'),
             '--local',
@@ -119,7 +125,7 @@ def build_initrd(bindir, params, config, path):
             # Create a simple uncompressed CPIO archive:
             '--no-compress',
             '--no-early-microcode',
-            '--add-drivers', ' '.join(drivers),
+            '--add-drivers', ' '+' '.join(drivers),
             # Additional options:
             *extra_args,
 
@@ -252,6 +258,10 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
             'ip=kdump0:dhcp',
             'rd.neednet=1'
         ))
+    else:
+        extra_qemu_args.extend((
+            '-hda', 'sda.raw',
+        ))
 
     # Other arch-specific arguments
     if arch == 'aarch64':
@@ -267,10 +277,6 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     if arch == 'riscv64':
         extra_qemu_args.extend((
             '-machine', 'virt',
-        ))
-    if not params['NET']:
-        extra_qemu_args.extend((
-            '-hda', 'sda.raw',
         ))
 
     kernel_args = (
@@ -309,13 +315,14 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
     
     f = open(params['TRACKRSS_LOG'], "w")
     f.close()
-    #tail_trackrss = subprocess.Popen(["tail", "-f", params['TRACKRSS_LOG']], stdout=2)
 
     subprocess.run(qemu_args, stdout=sys.stderr, stderr=sys.stderr, check=True)
 
     tail_messages.kill()
     
+    print("trackrss output:", file=sys.stderr)
     subprocess.run(['cat', params['TRACKRSS_LOG']], stdout=2)
+    print("(end of trackrss output)", file=sys.stderr)
 
     results = dict()
 
