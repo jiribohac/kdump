@@ -83,6 +83,7 @@ BuildRequires:  systemd
 BuildRequires:  NetworkManager
 BuildRequires:  iproute2
 BuildRequires:  dbus-1
+BuildRequires:  hostname
 BuildRequires:  dracut >= 047
 BuildRequires:  iputils
 BuildRequires:  kernel-default

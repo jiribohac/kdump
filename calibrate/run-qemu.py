@@ -114,6 +114,7 @@ def build_initrd(bindir, params, config, path):
             drivers.append('ext4')
         args = (
             os.path.abspath('dracut'),
+            '--debug',
             '--local',
             '--hostonly',
             '--no-hostonly-default-device',
