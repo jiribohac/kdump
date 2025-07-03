@@ -113,7 +113,6 @@ def build_initrd(bindir, params, config, path):
             extra_args = ('--mount', '/dev/disk/by-label/calib-disk /kdump/mnt ext3')
         args = (
             os.path.abspath('dracut'),
-            '--debug',
             '--local',
             '--hostonly',
             '--no-hostonly-default-device',
