@@ -363,6 +363,9 @@ def calc_diff(src, dst, key, diffkey):
     src[diffkey] = max(0, dst[key] - src[key])
 
 def dump_ok(crashdir):
+    if not os.path.isdir(crashdir):
+        print(crashdir + "does not exist", file=sys.stderr)
+
     with os.scandir(crashdir) as it:
         for entry in it:
             if not entry.name.startswith('.') and entry.is_dir():
