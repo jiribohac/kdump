@@ -105,13 +105,12 @@ def build_initrd(bindir, params, config, path):
         else:
             if params['ARCH'].startswith('x86') or \
                params['ARCH'].startswith('ppc'): 
-                extra_args = ('--mount', '/dev/sda /kdump/mnt ext3')
                 drivers.append('sd_mod')
             else:
-                extra_args = ('--mount', '/dev/vda /kdump/mnt ext3')
                 drivers.append('virtio_blk')
-
+            
             drivers.append('ext4')
+            extra_args = ('--mount', '/dev/disk/by-label/calib-disk /kdump/mnt ext3')
         args = (
             os.path.abspath('dracut'),
             '--debug',
@@ -409,8 +408,8 @@ with tempfile.TemporaryDirectory() as tmpdir:
     subprocess.run(('rm', '-rf', '/tmp/netdump'), stdout=sys.stderr, stderr=sys.stderr, check=False)
 
     # prepare disk image for saving the non-network dump
-    subprocess.run(('dd', 'if=/dev/zero', 'of=sda.raw', 'bs=1', 'seek=200M', 'count=1'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-    subprocess.run(('/usr/sbin/mkfs.ext3', 'sda.raw'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    subprocess.run(('dd', 'if=/dev/zero', 'of=disk.raw', 'bs=1', 'seek=200M', 'count=1'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    subprocess.run(('/usr/sbin/mkfs.ext3', '-L', 'calib-disk', 'disk.raw'), stdout=sys.stderr, stderr=sys.stderr, check=True)
 
     # configure and start ssh server for the network dump
     subprocess.run(('ssh-keygen', '-A'), stdout=sys.stderr, stderr=sys.stderr, check=True)
@@ -426,7 +425,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
     results = run_qemu(oldcwd, params, initrd, elfcorehdr)
     # verify that the dump completed successfully
     os.mkdir('mount')
-    subprocess.run(('mount', '-o', 'loop', 'sda.raw', 'mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
+    subprocess.run(('mount', '-o', 'loop', 'disk.raw', 'mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
     ret = dump_ok('mount/var/crash')
     subprocess.run(('umount', 'mount'), stdout=sys.stderr, stderr=sys.stderr, check=True)
     if not ret:
