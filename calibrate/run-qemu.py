@@ -103,7 +103,7 @@ def build_initrd(bindir, params, config, path):
                 drivers.append('e1000e')
             extra_args = []
         else:
-            if params['ARCH'].startswith('x86') or \
+            if params['ARCH'].startswith('x86') 
                 drivers.append('sd_mod')
             else:
                 drivers.append('virtio_blk')
