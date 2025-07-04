@@ -116,7 +116,7 @@ def build_initrd(bindir, params, config, path):
             os.path.abspath('dracut'),
             '--debug',
             '--local',
-            '--hostonly',
+            #'--hostonly',
             '--no-hostonly-default-device',
 
             # Standard kdump initrd options:
