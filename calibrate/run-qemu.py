@@ -108,7 +108,7 @@ def build_initrd(bindir, params, config, path):
             extra_args = ('--mount', '/dev/disk/by-label/calib-disk /kdump/mnt ext3')
         args = (
             os.path.abspath('dracut'),
-            '--debug',
+            #'--debug',
             '--local',
             '--hostonly',
             '--no-hostonly-default-device',
@@ -255,7 +255,7 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
         ))
     else:
         extra_qemu_args.extend((
-            '-drive', 'file=disk.raw,index=0,media=disk,if=sd',
+            '-drive', 'file=disk.raw,index=0,media=disk,if=virtio',
         ))
 
     # Other arch-specific arguments
