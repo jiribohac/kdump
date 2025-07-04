@@ -103,9 +103,7 @@ def build_initrd(bindir, params, config, path):
                 drivers.append('e1000e')
             extra_args = []
         else:
-            if params['ARCH'].startswith('x86'): 
                 drivers.append('sd_mod')
-            else:
                 drivers.append('virtio_blk')
                 drivers.append('virtio_scsi')
                 drivers.append('virtio_pci')
@@ -116,7 +114,7 @@ def build_initrd(bindir, params, config, path):
             os.path.abspath('dracut'),
             '--debug',
             '--local',
-            #'--hostonly',
+            '--hostonly',
             '--no-hostonly-default-device',
 
             # Standard kdump initrd options:
