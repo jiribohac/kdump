@@ -104,9 +104,6 @@ def build_initrd(bindir, params, config, path):
             extra_args = []
         else:
             drivers.append('sd_mod')
-            drivers.append('virtio_blk')
-            drivers.append('virtio_scsi')
-            drivers.append('virtio_pci')
             drivers.append('ext4')
             extra_args = ('--mount', '/dev/disk/by-label/calib-disk /kdump/mnt ext3')
         args = (
@@ -258,7 +255,7 @@ def run_qemu(bindir, params, initrd, elfcorehdr):
         ))
     else:
         extra_qemu_args.extend((
-            '-hda', 'disk.raw',
+            '-drive', 'file=disk.raw,index=0,media=disk,if=sd',
         ))
 
     # Other arch-specific arguments
@@ -409,7 +406,6 @@ with tempfile.TemporaryDirectory() as tmpdir:
     # prepare disk image for saving the non-network dump
     subprocess.run(('dd', 'if=/dev/zero', 'of=disk.raw', 'bs=1', 'seek=200M', 'count=1'), stdout=sys.stderr, stderr=sys.stderr, check=True)
     subprocess.run(('/usr/sbin/mkfs.ext3', '-L', 'calib-disk', 'disk.raw'), stdout=sys.stderr, stderr=sys.stderr, check=True)
-    subprocess.run(('dmesg'), stdout=sys.stderr, stderr=sys.stderr, check=True)
 
     # configure and start ssh server for the network dump
     subprocess.run(('ssh-keygen', '-A'), stdout=sys.stderr, stderr=sys.stderr, check=True)
