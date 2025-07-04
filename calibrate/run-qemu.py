@@ -103,11 +103,10 @@ def build_initrd(bindir, params, config, path):
                 drivers.append('e1000e')
             extra_args = []
         else:
-                drivers.append('sd_mod')
-                drivers.append('virtio_blk')
-                drivers.append('virtio_scsi')
-                drivers.append('virtio_pci')
-            
+            drivers.append('sd_mod')
+            drivers.append('virtio_blk')
+            drivers.append('virtio_scsi')
+            drivers.append('virtio_pci')
             drivers.append('ext4')
             extra_args = ('--mount', '/dev/disk/by-label/calib-disk /kdump/mnt ext3')
         args = (
