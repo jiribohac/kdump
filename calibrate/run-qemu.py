@@ -104,11 +104,11 @@ def build_initrd(bindir, params, config, path):
             extra_args = []
         else:
             drivers.append('sd_mod')
+            drivers.append('virtio_blk')
             drivers.append('ext4')
             extra_args = ('--mount', '/dev/disk/by-label/calib-disk /kdump/mnt ext3')
         args = (
             os.path.abspath('dracut'),
-            #'--debug',
             '--local',
             '--hostonly',
             '--no-hostonly-default-device',
